@@ -204,13 +204,23 @@ trait ContextProcessor extends ScalaNames with PackageName {
     makeCompositorNames(context)
   }
 
-  def getTypeGlobally(namespace: Option[String], typeName: String, context: XsdContext): TypeDecl =
-    (for (schema <- context.schemas;
-        if schema.targetNamespace == namespace;
-        if schema.topTypes.contains(typeName))
-      yield schema.topTypes(typeName)).headOption getOrElse {
-        throw new ReferenceNotFound("type" , namespace, typeName)
+  def getTypeGlobally(namespace: Option[String], typeName: String, context: XsdContext): TypeDecl = {
+    def getTypeBySchemas(selector: SchemaDecl => Boolean) : Option[TypeDecl] =  {
+      val matches =  for{
+        schema <- context.schemas.filter(selector)
+        if schema.topTypes.contains(typeName)
+      } yield {
+        schema.topTypes(typeName)
       }
+
+      matches.headOption
+    }
+
+    (getTypeBySchemas({ schema => schema.targetNamespace == namespace}) orElse
+      (if(config.useChameleons) getTypeBySchemas({schema => !schema.targetNamespace.isDefined}) else None)).getOrElse {
+      throw new ReferenceNotFound("type" , namespace, typeName)
+    }
+  }
 
   def resolveType(schema: SchemaDecl, context: XsdContext) {
     def containsTypeLocally(namespace: Option[String], typeName: String): Boolean =

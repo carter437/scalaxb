@@ -601,7 +601,7 @@ object {localName} {{
 
 { enumString }</source>
     }  // match
-        
+
     Snippet(traitCode,
       Nil,
       <source>  def build{formatterName} = new Default{formatterName} {{}}
@@ -615,9 +615,23 @@ object {localName} {{
     
     def writes(__obj: {fqn}, __namespace: Option[String], __elementLabel: Option[String],
         __scope: scala.xml.NamespaceBinding, __typeAttribute: Boolean): scala.xml.NodeSeq =
-      scala.xml.Elem(scalaxb.Helper.getPrefix(__namespace, __scope).orNull, 
-        __elementLabel getOrElse {{ sys.error("missing element label.") }},
-        scala.xml.Null, __scope, scala.xml.Text(__obj.toString))
+        {
+          config.targetScalaVersion match {
+            case Config.VersionPattern(x,y,_) if s"$x.$y" == "2.9" => {
+              """{
+                scala.xml.Elem(scalaxb.Helper.getPrefix(__namespace, __scope).orNull,
+                __elementLabel getOrElse {{ sys.error("missing element label.") }},
+                scala.xml.Null, __scope, scala.xml.Text(__obj.toString))"""
+            }
+            case _ => {
+              """{
+                scala.xml.Elem(scalaxb.Helper.getPrefix(__namespace, __scope).orNull,
+                __elementLabel getOrElse {{ sys.error("missing element label.") }},
+                scala.xml.Null, __scope, false, scala.xml.Text(__obj.toString))"""
+            }
+          }
+        }
+        }}
   }}</source>,
       makeImplicitValue(fqn, formatterName))
   }

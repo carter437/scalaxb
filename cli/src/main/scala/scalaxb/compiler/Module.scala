@@ -31,7 +31,9 @@ import javax.xml.parsers.SAXParser
 import java.io.{File, PrintWriter, Reader, BufferedReader}
 import collection.{mutable, Map, Set}
 
-case class Config(packageNames: Map[Option[String], Option[String]] = Map(None -> None),
+case class
+
+Config(packageNames: Map[Option[String], Option[String]] = Map(None -> None),
   classPrefix: Option[String] = None,
   classPostfix: Option[String] = None,
   paramPrefix: Option[String] = None,
@@ -48,7 +50,13 @@ case class Config(packageNames: Map[Option[String], Option[String]] = Map(None -
   contentsSizeLimit: Int = 20,
   sequenceChunkSize: Int = 10,
   laxAny: Boolean = false,
+  targetScalaVersion: String = "2.10",
+  useChameleons: Boolean = false,
   dispatchVersion: String = "0.10.1")
+
+object Config {
+  val VersionPattern = """(\d+)\.(\d+)(\.\d+)?""".r
+}
 
 object Snippet {
   def apply(definition: Node): Snippet = Snippet(definition, Nil, Nil, Nil)
@@ -501,6 +509,23 @@ trait Module {
         x
       case node => node 
     }).toString))
+  }
+
+  protected def resolveTemplate(config: Config, fileName: String): String = {
+    if (config.targetScalaVersion.startsWith ("2.9") ) {
+      fileName //assuming 2.9.x is default
+    }
+    else if (getClass.getResource (s"/${config.targetScalaVersion}/fileName") != null) {
+      s"/${config.targetScalaVersion}/$fileName"
+    }
+    else {
+      config.targetScalaVersion match {
+         case Config.VersionPattern(x,y,_) if getClass.getResource(s"/$x.$y/$fileName") != null => {
+           s"/$x.$y/$fileName"
+         }
+        case _ => fileName
+      }
+    }
   }
 }
 

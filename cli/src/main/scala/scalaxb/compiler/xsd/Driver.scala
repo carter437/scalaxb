@@ -84,7 +84,7 @@ class Driver extends Module { driver =>
   }
 
   def generateRuntimeFiles[To](cntxt: Context, config: Config)(implicit evTo: CanBeWriter[To]): List[To] =
-    List(generateFromResource[To](Some("scalaxb"), "scalaxb.scala", "/scalaxb.scala.template"))
+    List(generateFromResource[To](Some("scalaxb"), "scalaxb.scala", resolveTemplate(config,"/scalaxb.scala.template")))
 
   def readerToRawSchema(reader: Reader): RawSchema = CustomXML.load(reader)
 

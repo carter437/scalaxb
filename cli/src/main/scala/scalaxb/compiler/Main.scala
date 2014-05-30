@@ -36,8 +36,8 @@ object Main {
     // change this change SbtApp too.
     try { start(args); }
     catch {
-      case e: ReferenceNotFound =>
-        log.error(e.getMessage)
+      case e: ReferenceNotFound => { e.printStackTrace
+        log.error(e.getMessage) }
       case e: CaseClassTooLong =>
         log.error(e.getMessage)
       case e: Exception =>
@@ -108,6 +108,11 @@ object Arguments {
         c.copy(laxAny = true) }
       opt[String]("dispatch-version") valueName("<version>") text("version of Dispatch (default: 0.9.5)") action { (x, c) =>
         c.copy(dispatchVersion = x) }
+      opt[String]("scala-version") valueName("<version>") text("version of Scala (default: 2.9)") action { (x, c) =>
+        c.copy(targetScalaVersion = x) }
+      opt[Unit]("chameleons") text("search chameleon namespaces for types") action { (_, c) =>
+        c.copy(useChameleons = true)
+      }
       opt[Unit]('v', "verbose") text("be extra verbose") action { (_, c) =>
         verbose = true
         c
@@ -115,6 +120,9 @@ object Arguments {
       help("help") text("display this message")
       version("version") text("display version info")
       arg[File]("<schema_file>...") unbounded() text("input schema to be converted") action { (x, c) =>
+        //new java.io.File("/Users/croughton/Downloads/Hotelbeds XML Interface Specification v2013-04-1/xsd").listFiles.foreach(f => files append f)
+      //  files append new java.io.File("/Users/croughton/dev/projects/thirdparty/scalaxb/HotelValuedAvailRQ.xsd")//.listFiles.foreach(f => files append f)
+        //c
         files append x
         c
       }
