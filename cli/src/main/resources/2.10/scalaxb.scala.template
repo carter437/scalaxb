@@ -24,6 +24,10 @@ object `package` {
                       (implicit format: XMLFormat[A]): Either[String, A] = format.reads(seq, stack)
 
   @implicitNotFound(msg = "Cannot find CanWriteXML type class for ${A}")
+  def toXML[A](obj: A)(implicit format: CanWriteXML[A], scope: NamespaceBinding): NodeSeq =
+    toXML(obj, None, Some(obj.getClass.getSimpleName), scope)
+
+  @implicitNotFound(msg = "Cannot find CanWriteXML type class for ${A}")
   def toXML[A](obj: A, namespace: Option[String], elementLabel: Option[String],
       scope: NamespaceBinding, typeAttribute: Boolean = false)(implicit format: CanWriteXML[A]): NodeSeq =
     format.writes(obj, namespace, elementLabel, scope, typeAttribute)

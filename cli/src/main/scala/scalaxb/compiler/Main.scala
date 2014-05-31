@@ -120,10 +120,7 @@ object Arguments {
       help("help") text("display this message")
       version("version") text("display version info")
       arg[File]("<schema_file>...") unbounded() text("input schema to be converted") action { (x, c) =>
-        new java.io.File("/Users/croughton/Downloads/Hotelbeds XML Interface Specification v2013-04-2/xsd").listFiles.foreach(f => files append f)
-      //  files append new java.io.File("/Users/croughton/dev/projects/thirdparty/scalaxb/HotelValuedAvailRQ.xsd")//.listFiles.foreach(f => files append f)
-        //c
-      //  files append x
+        files append x
         c
       }
     }
