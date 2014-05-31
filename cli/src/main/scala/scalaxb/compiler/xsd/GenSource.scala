@@ -59,7 +59,7 @@ abstract class GenSource(val schema: SchemaDecl,
       snippets += makeGroup(group)
     for (group <- schema.topAttrGroups.valuesIterator)
       snippets += makeAttributeGroup(group)
-    
+
     Snippet(snippets: _*)
   }
     

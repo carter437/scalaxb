@@ -101,7 +101,10 @@ trait ContextProcessor extends ScalaNames with PackageName {
       case decl: ComplexTypeDecl =>
         anonymousTypes += ((schema, decl))
         logger.debug("processContent: %s's %s" format(elem.name, decl.name))
-        if (context.typeNames.contains(decl)) registerDuplicatedType(schema, decl, elem.name)
+        if (context.typeNames.contains(decl)) {
+          println(context.typeNames.mkString(","))
+          registerDuplicatedType(schema, decl, elem.name)
+        }
 
         context.typeNames.getOrElseUpdate(decl, {
           val prefix: Option[String] =

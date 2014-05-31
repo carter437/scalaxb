@@ -226,11 +226,11 @@ trait Module {
 
   def processReaders[From, To](files: Seq[From], config: Config)
      (implicit ev: CanBeRawSchema[From, RawSchema], evTo: CanBeWriter[To]): (CompileSource[From], List[To]) = {
-    val source = buildCompileSource(files)
+    val source = buildCompileSource(files,config)
     (source, processCompileSource(source, config))
   }
 
-  def buildCompileSource[From, To](files: Seq[From])
+  def buildCompileSource[From, To](files: Seq[From],config:Config)
      (implicit ev: CanBeRawSchema[From, RawSchema]): CompileSource[From] = {
 
     logger.debug("%s", files.toString())
@@ -269,7 +269,7 @@ trait Module {
         (importable, x) })
       if (added) addMissingFiles()
     }
-    def processUnnamedIncludes() {
+    def processUnnamedIncludes(config:Config) {
       logger.debug("processUnnamedIncludes")
       val all = (importables.toList map {_._1}) ++ (additionalImportables.toList map {_._1})
       val parents: ListBuffer[Importable] = ListBuffer(all filter { !_.includeLocations.isEmpty}: _*)
@@ -291,6 +291,7 @@ trait Module {
           tns foreach { tnsstr => xs foreach { x =>
             x.targetNamespace match {
               case Some(ns) =>
+              case None if config.useChameleons =>
               case None =>
                 logger.debug("processUnnamedIncludes - setting %s's outer namespace to %s", x.location, tnsstr)
                 count += 1
@@ -317,7 +318,7 @@ trait Module {
     }
 
     addMissingFiles()
-    processUnnamedIncludes()
+    processUnnamedIncludes(config)
     CompileSource(context, schemas, importables, additionalImportables,
       importables0(files.head).targetNamespace)
   }
@@ -374,11 +375,22 @@ trait Module {
     cs.schemas.valuesIterator.toSeq foreach { schema =>
       processSchema(schema, cs.context, config)
     }
-    processImportables(cs.importables.toList) :::
-    processImportables(cs.additionalImportables.toList) :::
-    List(processProtocol) :::
-    (if (config.generateRuntime) generateRuntimeFiles[To](cs.context, config)
-     else Nil)
+    val i1 = processImportables(cs.importables.toList)
+    val i2 = processImportables(cs.additionalImportables.toList)
+    val i3 = List(processProtocol)
+    val i4 = {
+      if (config.generateRuntime)
+        generateRuntimeFiles[To](cs.context, config)
+      else
+        Nil
+    }
+
+    i1.foreach(println)
+    i2.foreach(println)
+    i3.foreach(println)
+    i4.foreach(println)
+
+    i1 ::: i2 ::: i3 ::: i4
   }
 
   def generateFromResource[To](packageName: Option[String], fileName: String, resourcePath: String)

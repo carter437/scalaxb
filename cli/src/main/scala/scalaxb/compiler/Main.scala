@@ -108,7 +108,7 @@ object Arguments {
         c.copy(laxAny = true) }
       opt[String]("dispatch-version") valueName("<version>") text("version of Dispatch (default: 0.9.5)") action { (x, c) =>
         c.copy(dispatchVersion = x) }
-      opt[String]("scala-version") valueName("<version>") text("version of Scala (default: 2.9)") action { (x, c) =>
+      opt[String]("scala-version") valueName("<scala-version>") text("version of Scala (default: 2.9)") action { (x, c) =>
         c.copy(targetScalaVersion = x) }
       opt[Unit]("chameleons") text("search chameleon namespaces for types") action { (_, c) =>
         c.copy(useChameleons = true)
@@ -120,10 +120,10 @@ object Arguments {
       help("help") text("display this message")
       version("version") text("display version info")
       arg[File]("<schema_file>...") unbounded() text("input schema to be converted") action { (x, c) =>
-        //new java.io.File("/Users/croughton/Downloads/Hotelbeds XML Interface Specification v2013-04-1/xsd").listFiles.foreach(f => files append f)
+        new java.io.File("/Users/croughton/Downloads/Hotelbeds XML Interface Specification v2013-04-2/xsd").listFiles.foreach(f => files append f)
       //  files append new java.io.File("/Users/croughton/dev/projects/thirdparty/scalaxb/HotelValuedAvailRQ.xsd")//.listFiles.foreach(f => files append f)
         //c
-        files append x
+      //  files append x
         c
       }
     }
