@@ -120,7 +120,7 @@ object Arguments {
       help("help") text("display this message")
       version("version") text("display version info")
       arg[File]("<schema_file>...") unbounded() text("input schema to be converted") action { (x, c) =>
-        files append x
+        if(x.isDirectory) x.listFiles.foreach(f => files append f) else files append x
         c
       }
     }
